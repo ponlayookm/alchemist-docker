@@ -5,50 +5,50 @@ echo "Container is running"
 
 # Sync venv to workspace to support Network volumes
 echo "Syncing venv to workspace, please wait..."
-rsync -au /venv/ /workspace/venv/
+rsync -au /venv/ /venv/
 rm -rf /venv
 
 # Sync Web UI to workspace to support Network volumes
 echo "Syncing Stable Diffusion Web UI to workspace, please wait..."
-rsync -au /stable-diffusion-webui/ /workspace/stable-diffusion-webui/
+rsync -au /stable-diffusion-webui/ /stable-diffusion-webui/
 rm -rf /stable-diffusion-webui
 
 # Sync Kohya_ss to workspace to support Network volumes
 echo "Syncing Kohya_ss to workspace, please wait..."
-rsync -au /kohya_ss/ /workspace/kohya_ss/
+rsync -au /kohya_ss/ /kohya_ss/
 rm -rf /kohya_ss
 
 # Sync ComfyUI to workspace to support Network volumes
 echo "Syncing ComfyUI to workspace, please wait..."
-rsync -au /ComfyUI/ /workspace/ComfyUI/
+rsync -au /ComfyUI/ /ComfyUI/
 rm -rf /ComfyUI
 
 # Sync Application Manager to workspace to support Network volumes
 echo "Syncing Application Manager to workspace, please wait..."
-rsync -au /app-manager/ /workspace/app-manager/
+rsync -au /app-manager/ /app-manager/
 rm -rf /app-manager
 
 # Fix the venvs to make them work from /workspace
 echo "Fixing Stable Diffusion Web UI venv..."
-/fix_venv.sh /venv /workspace/venv
+/fix_venv.sh /venv /venv
 
 echo "Fixing Kohya_ss venv..."
-/fix_venv.sh /kohya_ss/venv /workspace/kohya_ss/venv
+/fix_venv.sh /kohya_ss/venv /kohya_ss/venv
 
 echo "Fixing ComfyUI venv..."
-/fix_venv.sh /ComfyUI/venv /workspace/ComfyUI/venv
+/fix_venv.sh /ComfyUI/venv /ComfyUI/venv
 
 # Link models and VAE if they are not already linked
-if [[ ! -L /workspace/stable-diffusion-webui/models/Stable-diffusion/sd_xl_base_1.0.safetensors ]]; then
-    ln -s /sd-models/sd_xl_base_1.0.safetensors /workspace/stable-diffusion-webui/models/Stable-diffusion/sd_xl_base_1.0.safetensors
+if [[ ! -L /stable-diffusion-webui/models/Stable-diffusion/sd_xl_base_1.0.safetensors ]]; then
+    ln -s /sd-models/sd_xl_base_1.0.safetensors /stable-diffusion-webui/models/Stable-diffusion/sd_xl_base_1.0.safetensors
 fi
 
-if [[ ! -L /workspace/stable-diffusion-webui/models/Stable-diffusion/sd_xl_refiner_1.0.safetensors ]]; then
-    ln -s /sd-models/sd_xl_refiner_1.0.safetensors /workspace/stable-diffusion-webui/models/Stable-diffusion/sd_xl_refiner_1.0.safetensors
+if [[ ! -L /stable-diffusion-webui/models/Stable-diffusion/sd_xl_refiner_1.0.safetensors ]]; then
+    ln -s /sd-models/sd_xl_refiner_1.0.safetensors /stable-diffusion-webui/models/Stable-diffusion/sd_xl_refiner_1.0.safetensors
 fi
 
-if [[ ! -L /workspace/stable-diffusion-webui/models/VAE/sdxl_vae.safetensors ]]; then
-    ln -s /sd-models/sdxl_vae.safetensors /workspace/stable-diffusion-webui/models/VAE/sdxl_vae.safetensors
+if [[ ! -L /stable-diffusion-webui/models/VAE/sdxl_vae.safetensors ]]; then
+    ln -s /sd-models/sdxl_vae.safetensors /stable-diffusion-webui/models/VAE/sdxl_vae.safetensors
 fi
 
 # Configure accelerate
@@ -57,11 +57,11 @@ mkdir -p /root/.cache/huggingface/accelerate
 mv /accelerate.yaml /root/.cache/huggingface/accelerate/default_config.yaml
 
 # Create logs directory
-mkdir -p /workspace/logs
+mkdir -p /logs
 
 # Start application manager
-cd /workspace/app-manager
-npm start > /workspace/logs/app-manager.log 2>&1 &
+cd /app-manager
+npm start > /logs/app-manager.log 2>&1 &
 
 if [[ ${DISABLE_AUTOLAUNCH} ]]
 then
