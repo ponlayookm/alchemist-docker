@@ -7,7 +7,7 @@ ARG KOHYA_VERSION=v22.1.0
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive \
-    TZ=Europe/London \
+    TZ=Asia/Bangkok \
     PYTHONUNBUFFERED=1 \
     SHELL=/bin/bash
 #ENV TORCH_COMMAND="pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118"
