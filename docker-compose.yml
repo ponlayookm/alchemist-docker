@@ -1,0 +1,63 @@
+version: "3"
+
+networks:
+  proxy:
+    external: true
+
+# secrets:
+#   gradio_auth:
+#     file: ${DIR_GRADIO_AUTH}
+
+services:
+  stable-diffusion:
+    image: ${IMAGE_VERSION}
+    container_name: ${CONTAINER_NAME}
+    # secrets:
+    #   - gradio_auth
+    environment:
+      - NVIDIA_DISABLE_REQUIRE=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      # - UID=${UID}
+      # - GID=${GID}
+      # - DIR_GRADIO_AUTH=/run/secrets/gradio_auth
+      # - DEBUG_MODE=${DEBUG_MODE}
+    # volumes:
+    #   - ${DIR_MODELS}:/home/user/stable-diffusion-webui/models
+    #   - ${DIR_OUT}:/home/user/stable-diffusion-webui/outputs
+    #   - ${DIR_STYLES}:/home/user/stable-diffusion-webui/styles
+    #   - ${DIR_EXTENSIONS}:/home/user/stable-diffusion-webui/models/extensions
+      # - ${DIR_UI_CONFIG}:/home/user/stable-diffusion-webui/settings/ui-config-user.json
+      # - ${DIR_UI_SETTINGS}:/home/user/stable-diffusion-webui/settings/config-user.json
+      # - ${DIR_WEBUI_SETTINGS}:/home/user/stable-diffusion-webui/settings/webui-user.sh
+      # SET FOR DEBUG PURPOSE
+      # - ./scripts/entrypoint.sh:/usr/local/bin/entrypoint.sh
+    networks:
+      - proxy
+    ports:
+      - 3001:3001
+      - 3011:3011
+      - 3021:3021
+      - 6066:6066
+      - 8888:8888
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: ["compute","utility"]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.constraint-label=prox
+      - traefik.http.routers.${CONTAINER_NAME}-http.rule=Host(`${CONTAINER_NAME}.gpumai.pro`)
+      - traefik.http.routers.${CONTAINER_NAME}-http.entrypoints=http
+      - traefik.http.routers.${CONTAINER_NAME}-http.middlewares=https-redirect
+      - traefik.http.routers.${CONTAINER_NAME}-https.rule=Host(`${CONTAINER_NAME}.gpumai.pro`)
+      - traefik.http.routers.${CONTAINER_NAME}-https.entrypoints=https
+      - traefik.http.routers.${CONTAINER_NAME}-https.tls=true
+      - traefik.http.routers.${CONTAINER_NAME}-https.tls.certresolver=le
+      - traefik.http.services.${CONTAINER_NAME}.loadbalancer.server.port=80
+
+    restart: unless-stopped
